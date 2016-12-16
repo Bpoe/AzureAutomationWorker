@@ -1,4 +1,4 @@
-﻿namespace AzureAutomation.Common
+﻿namespace AzureAutomation.Common.Models
 {
     public class RunbookData
     {

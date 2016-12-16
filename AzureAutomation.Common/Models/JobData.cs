@@ -1,5 +1,6 @@
-﻿namespace AzureAutomation.Common
+﻿namespace AzureAutomation.Common.Models
 {
+    using System;
     using System.Collections.Generic;
 
     public class JobData
@@ -53,7 +54,7 @@
 
         public string JobException; 
 
-        public string ModuleInfo; 
+        public ModuleInfoData[] ModuleInfo; 
 
         public string FullWorkflowScript; 
 
@@ -72,5 +73,14 @@
         public string AccountName; 
 
         public string TriggerSource; 
+    }
+
+    public class ModuleInfoData
+    {
+        public bool IsGlobal;
+        public Guid ModuleId;
+        public Guid ModuleVersionId;
+        public string Name;
+        public int VersionKey;
     }
 }

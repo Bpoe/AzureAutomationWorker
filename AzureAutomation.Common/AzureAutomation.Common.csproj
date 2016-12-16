@@ -51,20 +51,29 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="AgentService.cs" />
+    <Compile Include="BashRunbook.cs" />
     <Compile Include="Configuration.cs" />
+    <Compile Include="Models\CredentialData.cs" />
     <Compile Include="Exceptions.cs" />
     <Compile Include="Extensions.cs" />
     <Compile Include="Job.cs" />
-    <Compile Include="JobData.cs" />
-    <Compile Include="JobUpdatableData.cs" />
+    <Compile Include="Models\JobActionData.cs" />
+    <Compile Include="Models\JobData.cs" />
+    <Compile Include="Models\JobUpdatableData.cs" />
     <Compile Include="JrdsClient.cs" />
+    <Compile Include="PowerShellRunbook.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="Python2Runbook.cs" />
+    <Compile Include="Python3Runbook.cs" />
     <Compile Include="Runbook.cs" />
-    <Compile Include="RunbookData.cs" />
+    <Compile Include="Models\RunbookData.cs" />
+    <Compile Include="RunbookKind.cs" />
     <Compile Include="Runtime.cs" />
     <Compile Include="RuntimeFactory.cs" />
     <Compile Include="Sandbox.cs" />
+    <Compile Include="Models\SandboxActionData.cs" />
     <Compile Include="StreamHandler.cs" />
+    <Compile Include="Models\VariableData.cs" />
     <Compile Include="Worker.cs" />
   </ItemGroup>
   <ItemGroup>

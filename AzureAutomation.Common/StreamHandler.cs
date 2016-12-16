@@ -1,6 +1,7 @@
 ﻿namespace AzureAutomation.Common
 {
     using System.Diagnostics;
+    using Models;
 
     public class StreamHandler
     {

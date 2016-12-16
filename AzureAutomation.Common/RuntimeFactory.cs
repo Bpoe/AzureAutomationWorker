@@ -1,6 +1,7 @@
 ﻿namespace AzureAutomation.Common
 {
     using System;
+    using Models;
 
     public class RuntimeFactory
     {

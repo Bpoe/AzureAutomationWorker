@@ -2,6 +2,7 @@
 {
     using System.IO;
     using System.Text;
+    using Models;
 
     public class Runbook
     {
@@ -32,7 +33,7 @@
             this.ValidateSignature();
         }
 
-        private void WriteToDisk()
+        public void WriteToDisk()
         {
             var fileName = this.RunbookData.Name + this.RunbookData.RunbookVersionId + this.FileExtension;
             var workingDirectory = string.Empty;

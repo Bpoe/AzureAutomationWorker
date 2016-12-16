@@ -4,6 +4,8 @@
     using System.Net;
     using System.Net.Http;
     using System.Net.Http.Headers;
+    using System.Threading.Tasks;
+    using Models;
     using Newtonsoft.Json;
 
     public class JrdsClient
@@ -27,20 +29,17 @@
             this.machineId = string.Empty; // configuration.get_machine_id();
         }
 
-        public string GetSandboxActions()
+        public SandboxActionData[] GetSandboxActions()
         {
             var url = this.baseUri + "/automationAccounts/" + this.accountId +
                       "/Sandboxes/GetSandboxActions?HybridWorkerGroupName=" + this.hybridWorkerGroupName +
                       "&api-version=" + this.protocolVersion;
+            const string errorMessage = "Unable to get sandbox actions.";
 
-            var request = this.httpClient.GetAsync(url).Result;
-            request.EnsureSuccessStatusCode("Unable to get sandbox actions. [status=" + request.StatusCode + "]");
-
-            return request.Content.ReadAsStringAsync().Result;
-            // return request.deserialized_data["value"]
+            return this.GetAndDeserialize<SandboxActionData[]>(url, errorMessage).Result;
         }
 
-        public string GetJobActions(string sandboxId)
+        public JobActionData[] GetJobActions(string sandboxId)
         {
 
             var url = this.baseUri + "/automationAccounts/" + this.accountId + "/Sandboxes/" + sandboxId +
@@ -55,12 +54,12 @@
 
             request.EnsureSuccessStatusCode("Unable to get job actions. [status=" + request.StatusCode + "]");
 
-            var jobActions = request.Content.ReadAsStringAsync().Result;
+            var content = request.Content.ReadAsStringAsync().Result;
+            var jobActions = JsonConvert.DeserializeObject<JobActionData[]>(content);
 
-            if (true) // if len(job_actions) != 0:
+            foreach (var jobAction in jobActions)
             {
-                var messageMetadata = string.Empty; // message_metadatas = [action["MessageMetadata"] for action in job_actions]
-                this.AcknowledgeJobAction(sandboxId, messageMetadata);
+                this.AcknowledgeJobAction(sandboxId, jobAction.MessageMetaData);
             }
 
             return jobActions;
@@ -70,67 +69,55 @@
         {
             var url = this.baseUri + "/automationAccounts/" + this.accountId + "/jobs/" + jobId + "?api-version=" +
                       this.protocolVersion;
-            var request = this.httpClient.GetAsync(url).Result;
-            request.EnsureSuccessStatusCode("Unable to get job. [status=" + request.StatusCode + "]");
-            return JsonConvert.DeserializeObject<JobData>(request.Content.ReadAsStringAsync().Result);
+            const string errorMessage = "Unable to get job.";
+
+            return this.GetAndDeserialize<JobData>(url, errorMessage).Result;
         }
 
         public JobUpdatableData GetJobUpdatableData(string jobId)
         {
             var url = this.baseUri + "/automationAccounts/" + this.accountId + "/jobs/" + jobId +
                       "/getUpdatableData?api-version=" + this.protocolVersion;
+            const string errorMessage = "Unable to get job.";
 
-            var request = this.httpClient.GetAsync(url).Result;
-
-            request.EnsureSuccessStatusCode("Unable to get job. [status=" + request.StatusCode + "]");
-            return JsonConvert.DeserializeObject<JobUpdatableData>(request.Content.ReadAsStringAsync().Result);
+            return this.GetAndDeserialize<JobUpdatableData>(url, errorMessage).Result;
         }
 
         public RunbookData GetRunbookData(string runbookVersionId)
         {
             var url = this.baseUri + "/automationAccounts/" + this.accountId + "/runbooks/" + runbookVersionId +
                 "?api-version=" + this.protocolVersion;
+            const string errorMessage = "Unable to get runbook.";
 
-            var request = this.httpClient.GetAsync(url).Result;
-
-            request.EnsureSuccessStatusCode("Unable to get runbook. [status=" + request.StatusCode + "]");
-            return JsonConvert.DeserializeObject<RunbookData>(request.Content.ReadAsStringAsync().Result);
+            return this.GetAndDeserialize<RunbookData>(url, errorMessage).Result;
         }
 
-        public string GetVariableAsset(string name)
+        public VariableData GetVariableAsset(string name)
         {
             var url = this.baseUri + "/automationAccounts/" + this.accountId + "/variables/" + name +
                 "?api-version=" + this.protocolVersion;
+            const string errorMessage = "Unable to get variable.";
 
-            var request = this.httpClient.GetAsync(url).Result;
-
-            request.EnsureSuccessStatusCode("Unable to get variable. [status=" + request.StatusCode + "]");
-            return request.Content.ReadAsStringAsync().Result;
+            return this.GetAndDeserialize<VariableData>(url, errorMessage).Result;
         }
 
-        public string GetCredentialAsset(string name)
+        public CredentialData GetCredentialAsset(string name)
         {
             var url = this.baseUri + "/automationAccounts/" + this.accountId + "/credentials/" + name +
                 "?api-version=" + this.protocolVersion;
+            const string errorMessage = "Unable to get credential.";
 
-            var request = this.httpClient.GetAsync(url).Result;
-
-            request.EnsureSuccessStatusCode("Unable to get credential. [status=" + request.StatusCode + "]");
-            return request.Content.ReadAsStringAsync().Result;
+            return this.GetAndDeserialize<CredentialData>(url, errorMessage).Result;
         }
 
-        public void AcknowledgeJobAction(string sandboxId, string messageMetadata)
+        public void AcknowledgeJobAction(string sandboxId, MessageMetaData messageMetadata)
         {
-            var payload = "{ 'MessageMetadatas': '" + messageMetadata + "'}";
-
             var url = this.baseUri + "/automationAccounts/" + this.accountId + "/Sandboxes/" + sandboxId +
                 "/jobs/AcknowledgeJobActions?api-version=" + this.protocolVersion;
+            const string errorMessage = "Unable to acknowledge job action.";
 
-            var content = new StringContent(payload);
-            content.Headers.ContentType = MediaTypeHeaderValue.Parse("application/json");
-
-            var request = this.httpClient.PostAsync(url, content).Result;
-            request.EnsureSuccessStatusCode("Unable to acknowledge job action. [status=" + request.StatusCode + "]");
+            var payload = "{ 'MessageMetadatas': '" + messageMetadata + "'}";
+            this.PostObject(url, payload, errorMessage).Wait();
         }
 
         public void SetJobStatus(
@@ -140,20 +127,19 @@
             bool isTerminal,
             string exception = null)
         {
-            var payload = "{ 'exception': '" + exception + "', 'isFinalStatus': '" + isTerminal + "', 'jobStatus': '" + jobStatus + "'}";
-
             var url = this.baseUri + "/automationAccounts/" + this.accountId + "/Sandboxes/" + sandboxId +
                 "/jobs/" + jobId + "/changeStatus?api-version=" + this.protocolVersion;
+            const string errorMessage = "Unable to set job status.";
 
-            var content = new StringContent(payload);
-            content.Headers.ContentType = MediaTypeHeaderValue.Parse("application/json");
-
-            var request = this.httpClient.PostAsync(url, content).Result;
-            request.EnsureSuccessStatusCode("Unable to set job status. [status=" + request.StatusCode + "]");
+            var payload = "{ 'exception': '" + exception + "', 'isFinalStatus': '" + isTerminal + "', 'jobStatus': '" + jobStatus + "'}";
+            this.PostObject(url, payload, errorMessage).Wait();
         }
 
         public void SetStream(string jobId, string runbookVersionId, string streamText, string streamType, int sequenceNumber)
         {
+            var url = this.baseUri + "/automationAccounts/" + this.accountId + "/jobs/" + jobId + "/postJobStream?api-version=" + this.protocolVersion;
+            const string errorMessage = "Unable to set streams.";
+
             var payload = "{" +
                           "'AccountId': '" + this.accountId + "'," +
                           "'JobId': '" + jobId + "'," +
@@ -163,33 +149,20 @@
                           "'StreamRecord': '', " +
                           "'StreamRecordText': '" + streamText + "', " +
                           "'Type':'" + streamType + "' }";
-
-
-            var url = this.baseUri + "/automationAccounts/" + this.accountId + "/jobs/" + jobId + "/postJobStream?api-version=" + this.protocolVersion;
-
-            var content = new StringContent(payload);
-            content.Headers.ContentType = MediaTypeHeaderValue.Parse("application/json");
-
-            var request = this.httpClient.PostAsync(url, content).Result;
-            request.EnsureSuccessStatusCode("Unable to set streams. [status=" + request.StatusCode + "]");
+            this.PostObject(url, payload, errorMessage).Wait();
         }
 
         public void SetLog(string eventId, string activityId, string logType, string args)
         {
+            var url = this.baseUri + "/automationAccounts/" + this.accountId + "/logs?api-version=" + this.protocolVersion;
+            const string errorMessage = "Unable to set log.";
+
             var payload = "{" +
                           "'activityId': '" + activityId + "'," +
                           "'args': '" + args + "'," +
                           "'eventId': '" + eventId + "', " +
                           "'logType': '" + logType + "' }";
-
-
-            var url = this.baseUri + "/automationAccounts/" + this.accountId + "/logs?api-version=" + this.protocolVersion;
-
-            var content = new StringContent(payload);
-            content.Headers.ContentType = MediaTypeHeaderValue.Parse("application/json");
-
-            var request = this.httpClient.PostAsync(url, content).Result;
-            request.EnsureSuccessStatusCode("Unable to set log. [status=" + request.StatusCode + "]");
+            this.PostObject(url, payload, errorMessage).Wait();
         }
 
         public void UnloadJob(
@@ -200,22 +173,36 @@
             DateTime startTime,
             long executiontime)
         {
+            var url = this.baseUri + "/automationAccounts/" + this.accountId + "/Sandboxes/" + sandboxId +
+                "/jobs/" + jobId + "/unload?api-version=" + this.protocolVersion;
+            const string errorMessage = "Unable to unload job.";
             var payload = "{" +
               "'executionTimeInSeconds': '" + executiontime + "'," +
               "'isTest': '" + isTest + "'," +
               "'jobId': '" + jobId + "', " +
               "'startTime': '" + startTime + "', " + // .isoformat()
               "'subscriptionId': '" + subscriptionId + "' }";
+            this.PostObject(url, payload, errorMessage).Wait();
+        }
 
+        private async Task<T> GetAndDeserialize<T>(string url, string errorMessage)
+        {
+            var request = await this.httpClient.GetAsync(url);
+            request.EnsureSuccessStatusCode(
+                string.Format("{0} [status={1}]", errorMessage, request.StatusCode));
 
-            var url = this.baseUri + "/automationAccounts/" + this.accountId + "/Sandboxes/" + sandboxId +
-                "/jobs/" + jobId + "/unload?api-version=" + this.protocolVersion;
+            var content = await request.Content.ReadAsStringAsync();
+            return JsonConvert.DeserializeObject<T>(content);
+        }
 
-            var content = new StringContent(payload);
+        private async Task PostObject<T>(string url, T payload, string errorMessage)
+        {
+            var content = new StringContent(JsonConvert.SerializeObject(payload));
             content.Headers.ContentType = MediaTypeHeaderValue.Parse("application/json");
 
-            var request = this.httpClient.PostAsync(url, content).Result;
-            request.EnsureSuccessStatusCode("Unable to unload job. [status=" + request.StatusCode + "]");
+            var request = await this.httpClient.PostAsync(url, content);
+            request.EnsureSuccessStatusCode(
+                string.Format("{0} [status={1}]", errorMessage, request.StatusCode));
         }
     }
 }
