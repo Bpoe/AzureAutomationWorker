@@ -9,6 +9,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AzureAutomation.Sandbox", "
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AzureAutomation.Common", "AzureAutomation.Common\AzureAutomation.Common.csproj", "{561A309C-CCFD-4587-84F7-FA94CA9B450B}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AzureAutomation.Register", "AzureAutomation.Register\AzureAutomation.Register.csproj", "{253417E8-B874-4315-A767-DCB7036F9209}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -27,6 +29,10 @@ Global
 		{561A309C-CCFD-4587-84F7-FA94CA9B450B}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{561A309C-CCFD-4587-84F7-FA94CA9B450B}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{561A309C-CCFD-4587-84F7-FA94CA9B450B}.Release|Any CPU.Build.0 = Release|Any CPU
+		{253417E8-B874-4315-A767-DCB7036F9209}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{253417E8-B874-4315-A767-DCB7036F9209}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{253417E8-B874-4315-A767-DCB7036F9209}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{253417E8-B874-4315-A767-DCB7036F9209}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

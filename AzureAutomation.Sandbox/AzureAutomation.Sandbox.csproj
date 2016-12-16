@@ -50,9 +50,9 @@
     <None Include="App.config" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\AzureAutomation.Agent\AzureAutomation.Agent.csproj">
-      <Project>{eaf19d66-aa25-4428-93da-445dc2d4b4ec}</Project>
-      <Name>AzureAutomation.Agent</Name>
+    <ProjectReference Include="..\AzureAutomation.Common\AzureAutomation.Common.csproj">
+      <Project>{561a309c-ccfd-4587-84f7-fa94ca9b450b}</Project>
+      <Name>AzureAutomation.Common</Name>
     </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
