@@ -42,6 +42,7 @@
     </Reference>
     <Reference Include="System" />
     <Reference Include="System.Core" />
+    <Reference Include="System.Net.Http.WebRequest" />
     <Reference Include="System.Xml.Linq" />
     <Reference Include="System.Data.DataSetExtensions" />
     <Reference Include="Microsoft.CSharp" />
@@ -50,9 +51,11 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="AgentService.cs" />
+    <Compile Include="AgentServiceClient.cs" />
     <Compile Include="BashRunbook.cs" />
+    <Compile Include="ComputerInformation.cs" />
     <Compile Include="Configuration.cs" />
+    <Compile Include="HttpClientWithClientCertificates.cs" />
     <Compile Include="Models\CredentialData.cs" />
     <Compile Include="Exceptions.cs" />
     <Compile Include="Extensions.cs" />
